@@ -1,6 +1,16 @@
-from datetime import date
+from datetime import date, datetime
 
 from pydantic import BaseModel
+
+
+# Authentication Schemas
+class Token(BaseModel):
+    access_token: str
+    token_type: str
+
+
+class TokenData(BaseModel):
+    user_id: int | None = None
 
 
 # Schéma de réponse json pour les requetes
@@ -24,6 +34,8 @@ class ProductCreate(ProductBase):
 
 class ProductRead(ProductBase):
     Product_ID: int
+    created_at: datetime
+    updated_at: datetime
 
     class Config:
         from_attributes = True
@@ -45,10 +57,19 @@ class UserBase(BaseModel):
 
 class UserCreate(UserBase):
     User_password: str
+    isAdmin: bool = False
+
+
+class UserLogin(BaseModel):
+    User_mail: str
+    User_password: str
 
 
 class UserRead(UserBase):
     User_ID: int
+    isAdmin: bool
+    created_at: datetime
+    updated_at: datetime
 
     class Config:
         from_attributes = True
@@ -66,6 +87,8 @@ class EquipmentCreate(EquipmentBase):
 
 class EquipmentRead(EquipmentBase):
     Equipment_ID: int
+    created_at: datetime
+    updated_at: datetime
 
     class Config:
         from_attributes = True
@@ -88,6 +111,8 @@ class WorkoutSessionCreate(WorkoutSessionBase):
 
 class WorkoutSessionRead(WorkoutSessionBase):
     Session_ID: int
+    created_at: datetime
+    updated_at: datetime
 
     class Config:
         from_attributes = True
@@ -105,6 +130,8 @@ class MealLogCreate(MealLogBase):
 
 class MealLogRead(MealLogBase):
     Log_ID: int
+    created_at: datetime
+    updated_at: datetime
 
     class Config:
         from_attributes = True
@@ -124,6 +151,8 @@ class BiometricsLogCreate(BiometricsLogBase):
 
 class BiometricsLogRead(BiometricsLogBase):
     Log_ID: int
+    created_at: datetime
+    updated_at: datetime
 
     class Config:
         from_attributes = True

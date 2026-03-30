@@ -1,4 +1,5 @@
-from sqlalchemy import Column, Integer, String, Float, Table, ForeignKey
+from datetime import datetime
+from sqlalchemy import Column, Integer, String, Float, Table, ForeignKey, DateTime, Boolean
 from sqlalchemy.orm import relationship
 from src.database import Base
 
@@ -15,6 +16,9 @@ class User(Base):
     User_ID = Column(Integer, primary_key=True, index=True)
     User_mail = Column(String, unique=True, index=True)
     User_password = Column(String)
+    isAdmin = Column(Boolean, default=False, nullable=False)
+    created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
+    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow, nullable=False)
     User_Subscription = Column(String, nullable=True)
     User_age = Column(Integer, nullable=True)
     User_weight = Column(Float, nullable=True)

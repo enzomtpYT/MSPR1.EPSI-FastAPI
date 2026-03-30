@@ -1,4 +1,5 @@
-from sqlalchemy import Column, Integer, Float, Date, String, ForeignKey
+from datetime import datetime
+from sqlalchemy import Column, Integer, Float, Date, String, ForeignKey, DateTime
 from src.database import Base
 
 class WorkoutSession(Base):
@@ -13,3 +14,5 @@ class WorkoutSession(Base):
     Session_Duration = Column(Integer, nullable=True)
     Session_Type = Column(String, nullable=True)
     User_Feedback_Score = Column(Integer, nullable=True)
+    created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
+    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow, nullable=False)
