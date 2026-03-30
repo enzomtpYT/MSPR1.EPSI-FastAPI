@@ -156,3 +156,14 @@ class BiometricsLogRead(BiometricsLogBase):
 
     class Config:
         from_attributes = True
+
+
+class UserAnalyticsSummary(BaseModel):
+    user_id: int
+    meal_logs_count: int
+    workout_sessions_count: int
+    biometrics_logs_count: int
+    total_logged_kcal: float
+    avg_workout_duration_minutes: float | None = None
+    avg_sleep_hours: float | None = None
+    latest_weight: float | None = None
