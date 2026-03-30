@@ -175,7 +175,7 @@ Erreurs courantes:
 ## 2) Produits
 
 ### POST /products/
-Creer un produit (endpoint protege).
+Creer un produit (admin uniquement).
 
 Entree (JSON):
 ```json
@@ -198,6 +198,7 @@ Sortie (201): objet `ProductRead`.
 
 Erreurs courantes:
 - 401: token absent/invalide
+- 403: utilisateur non admin
 - 422: payload invalide
 
 ### GET /products/
@@ -226,7 +227,7 @@ Erreurs courantes:
 - 404: produit introuvable
 
 ### PUT /products/{product_id}
-Modifier un produit.
+Modifier un produit (admin uniquement).
 
 Entree:
 - Path param: `product_id`
@@ -237,10 +238,11 @@ Sortie (200): objet `ProductRead` mis a jour.
 
 Erreurs courantes:
 - 401: token absent/invalide
+- 403: utilisateur non admin
 - 404: produit introuvable
 
 ### DELETE /products/{product_id}
-Supprimer un produit.
+Supprimer un produit (admin uniquement).
 
 Entree:
 - Path param: `product_id`
@@ -250,6 +252,7 @@ Sortie (204): vide.
 
 Erreurs courantes:
 - 401: token absent/invalide
+- 403: utilisateur non admin
 - 404: produit introuvable
 
 ---

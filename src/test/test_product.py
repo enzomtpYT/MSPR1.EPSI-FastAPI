@@ -11,9 +11,9 @@ from src.models.user import User
 class TestCreateProduct:
     """Tests for product creation endpoint."""
     
-    def test_create_product_success(self, client: TestClient, user_token: str):
-        """Test successful product creation."""
-        headers = {"Authorization": f"Bearer {user_token}"}
+    def test_create_product_success_admin(self, client: TestClient, admin_token: str):
+        """Test admin can create products."""
+        headers = {"Authorization": f"Bearer {admin_token}"}
         response = client.post(
             "/api/v0/products/",
             json={
@@ -33,6 +33,20 @@ class TestCreateProduct:
         assert data["product_kcal"] == 165.0
         assert "Product_ID" in data
         assert "created_at" in data
+
+    def test_create_product_forbidden_non_admin(self, client: TestClient, user_token: str):
+        """Test regular user cannot create products."""
+        headers = {"Authorization": f"Bearer {user_token}"}
+        response = client.post(
+            "/api/v0/products/",
+            json={
+                "product_name": "Test Product",
+                "product_kcal": 100.0,
+            },
+            headers=headers,
+        )
+        assert response.status_code == status.HTTP_403_FORBIDDEN
+        assert "Only admins can manage products" in response.json()["detail"]
     
     def test_create_product_unauthorized(self, client: TestClient):
         """Test creating product without authentication fails."""
@@ -45,9 +59,9 @@ class TestCreateProduct:
         )
         assert response.status_code == status.HTTP_401_UNAUTHORIZED
     
-    def test_create_product_minimal(self, client: TestClient, user_token: str):
-        """Test creating product with minimal data."""
-        headers = {"Authorization": f"Bearer {user_token}"}
+    def test_create_product_minimal_admin(self, client: TestClient, admin_token: str):
+        """Test admin can create product with minimal data."""
+        headers = {"Authorization": f"Bearer {admin_token}"}
         response = client.post(
             "/api/v0/products/",
             json={
@@ -60,9 +74,9 @@ class TestCreateProduct:
         assert data["product_name"] == "Apple"
         assert data["product_kcal"] is None
     
-    def test_create_product_missing_name(self, client: TestClient, user_token: str):
-        """Test creating product without name fails."""
-        headers = {"Authorization": f"Bearer {user_token}"}
+    def test_create_product_missing_name_admin(self, client: TestClient, admin_token: str):
+        """Test creating product without name fails for admin too."""
+        headers = {"Authorization": f"Bearer {admin_token}"}
         response = client.post(
             "/api/v0/products/",
             json={
@@ -152,9 +166,9 @@ class TestGetProductById:
 class TestUpdateProduct:
     """Tests for updating product endpoint."""
     
-    def test_update_product_success(self, client: TestClient, user_token: str, test_product: Product):
-        """Test successful product update."""
-        headers = {"Authorization": f"Bearer {user_token}"}
+    def test_update_product_success_admin(self, client: TestClient, admin_token: str, test_product: Product):
+        """Test admin can update products."""
+        headers = {"Authorization": f"Bearer {admin_token}"}
         response = client.put(
             f"/api/v0/products/{test_product.Product_ID}",
             json={
@@ -168,6 +182,19 @@ class TestUpdateProduct:
         data = response.json()
         assert data["product_name"] == "Updated Product"
         assert data["product_kcal"] == 200.0
+
+    def test_update_product_forbidden_non_admin(self, client: TestClient, user_token: str, test_product: Product):
+        """Test regular user cannot update products."""
+        headers = {"Authorization": f"Bearer {user_token}"}
+        response = client.put(
+            f"/api/v0/products/{test_product.Product_ID}",
+            json={
+                "product_name": "Updated Product",
+            },
+            headers=headers,
+        )
+        assert response.status_code == status.HTTP_403_FORBIDDEN
+        assert "Only admins can manage products" in response.json()["detail"]
     
     def test_update_product_unauthorized(self, client: TestClient, test_product: Product):
         """Test updating product without authentication fails."""
@@ -179,9 +206,9 @@ class TestUpdateProduct:
         )
         assert response.status_code == status.HTTP_401_UNAUTHORIZED
     
-    def test_update_product_not_found(self, client: TestClient, user_token: str):
+    def test_update_product_not_found_admin(self, client: TestClient, admin_token: str):
         """Test updating non-existent product fails."""
-        headers = {"Authorization": f"Bearer {user_token}"}
+        headers = {"Authorization": f"Bearer {admin_token}"}
         response = client.put(
             "/api/v0/products/99999",
             json={
@@ -191,3 +218,41 @@ class TestUpdateProduct:
         )
         assert response.status_code == status.HTTP_404_NOT_FOUND
         assert "Product not found" in response.json()["detail"]
+
+
+class TestDeleteProduct:
+    """Tests for deleting product endpoint."""
+
+    def test_delete_product_success_admin(self, client: TestClient, admin_token: str, test_product: Product):
+        """Test admin can delete products."""
+        headers = {"Authorization": f"Bearer {admin_token}"}
+        response = client.delete(
+            f"/api/v0/products/{test_product.Product_ID}",
+            headers=headers,
+        )
+        assert response.status_code == status.HTTP_204_NO_CONTENT
+
+    def test_delete_product_forbidden_non_admin(self, client: TestClient, user_token: str, test_product: Product):
+        """Test regular user cannot delete products."""
+        headers = {"Authorization": f"Bearer {user_token}"}
+        response = client.delete(
+            f"/api/v0/products/{test_product.Product_ID}",
+            headers=headers,
+        )
+        assert response.status_code == status.HTTP_403_FORBIDDEN
+        assert "Only admins can manage products" in response.json()["detail"]
+
+    def test_delete_product_not_found_admin(self, client: TestClient, admin_token: str):
+        """Test deleting non-existent product fails."""
+        headers = {"Authorization": f"Bearer {admin_token}"}
+        response = client.delete(
+            "/api/v0/products/99999",
+            headers=headers,
+        )
+        assert response.status_code == status.HTTP_404_NOT_FOUND
+        assert "Product not found" in response.json()["detail"]
+
+    def test_delete_product_unauthorized(self, client: TestClient, test_product: Product):
+        """Test deleting product without auth fails."""
+        response = client.delete(f"/api/v0/products/{test_product.Product_ID}")
+        assert response.status_code == status.HTTP_401_UNAUTHORIZED

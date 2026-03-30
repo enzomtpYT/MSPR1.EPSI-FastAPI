@@ -1,6 +1,6 @@
 from typing import Annotated
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 
 from src.database import get_db
@@ -14,8 +14,17 @@ DB = Annotated[Session, Depends(get_db)]
 CurrentUser = Annotated[User, Depends(get_current_user)]
 
 
+def ensure_admin(current_user: User) -> None:
+    if not current_user.isAdmin:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Only admins can manage products",
+        )
+
+
 @router.post("/", response_model=ProductRead, status_code=201)
 def create_product(product: ProductCreate, db: DB, current_user: CurrentUser):
+    ensure_admin(current_user)
     db_product = Product(**product.model_dump())
     db.add(db_product)
     db.commit()
@@ -39,6 +48,7 @@ def get_product(product_id: int, db: DB, current_user: CurrentUser):
 
 @router.put("/{product_id}", response_model=ProductRead)
 def update_product(product_id: int, payload: ProductCreate, db: DB, current_user: CurrentUser):
+    ensure_admin(current_user)
     product = db.query(Product).filter(Product.Product_ID == product_id).first()
     if not product:
         raise HTTPException(404, "Product not found")
@@ -51,6 +61,7 @@ def update_product(product_id: int, payload: ProductCreate, db: DB, current_user
 
 @router.delete("/{product_id}", status_code=204)
 def delete_product(product_id: int, db: DB, current_user: CurrentUser):
+    ensure_admin(current_user)
     product = db.query(Product).filter(Product.Product_ID == product_id).first()
     if not product:
         raise HTTPException(404, "Product not found")
