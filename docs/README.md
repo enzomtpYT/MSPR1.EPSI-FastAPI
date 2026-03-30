@@ -8,6 +8,7 @@ Cette documentation est organisee pour separer clairement:
 ## Sommaire
 - Endpoints API: voir `docs/endpoints.md`
 - Tests Pytest: voir `docs/pytest.md`
+- Inventaire des donnees et flux backend: voir `docs/data-inventory-flow.md`
 
 ## Remarque
 La documentation Pytest est volontairement centralisee dans un seul fichier: `docs/pytest.md`.
