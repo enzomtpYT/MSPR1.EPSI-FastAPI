@@ -95,7 +95,7 @@ class WorkoutSessionBase(BaseModel):
     Session_AvgBpm: int | None = None
     Session_RestingBpm: int | None = None
     Session_Duration: int | None = None
-    WorkoutType_ID: int
+    Session_Type: str | None = None
     User_Feedback_Score: int | None = None
 
 
@@ -105,21 +105,6 @@ class WorkoutSessionCreate(WorkoutSessionBase):
 
 class WorkoutSessionRead(WorkoutSessionBase):
     Session_ID: int
-    created_at: datetime
-    updated_at: datetime
-    model_config = ConfigDict(from_attributes=True)
-
-
-class WorkoutTypeBase(BaseModel):
-    WorkoutType_Name: str
-
-
-class WorkoutTypeCreate(WorkoutTypeBase):
-    pass
-
-
-class WorkoutTypeRead(WorkoutTypeBase):
-    WorkoutType_ID: int
     created_at: datetime
     updated_at: datetime
     model_config = ConfigDict(from_attributes=True)

@@ -1,15 +1,10 @@
 """Tests for CSV export endpoints."""
 
 import csv
-from datetime import date
 from io import StringIO
 
 from fastapi import status
 from fastapi.testclient import TestClient
-from sqlalchemy.orm import Session
-
-from src.models.workout_session import WorkoutSession
-from src.models.workout_type import WorkoutType
 
 
 def _read_csv_rows(response_text: str) -> list[dict[str, str]]:
@@ -59,37 +54,3 @@ class TestCsvExports:
         lines = [line for line in response.text.splitlines() if line.strip()]
         assert len(lines) == 1
         assert lines[0].startswith("Log_ID,User_ID,Product_ID,Log_Date")
-
-    def test_export_workout_sessions_csv_includes_workout_type_fields(
-        self,
-        client: TestClient,
-        db: Session,
-        test_user,
-        admin_token: str,
-    ):
-        workout_type = WorkoutType(WorkoutType_Name="running")
-        db.add(workout_type)
-        db.commit()
-        db.refresh(workout_type)
-
-        workout_session = WorkoutSession(
-            User_ID=test_user.User_ID,
-            Session_Date=date(2026, 4, 1),
-            Session_Duration=35,
-            WorkoutType_ID=workout_type.WorkoutType_ID,
-        )
-        db.add(workout_session)
-        db.commit()
-
-        headers = {"Authorization": f"Bearer {admin_token}"}
-        response = client.get("/api/v0/exports/workout-sessions.csv", headers=headers)
-
-        assert response.status_code == status.HTTP_200_OK
-        rows = _read_csv_rows(response.text)
-        assert len(rows) >= 1
-        assert "WorkoutType_ID" in rows[0]
-        assert "WorkoutType_Name" in rows[0]
-        assert any(
-            row["WorkoutType_Name"] == workout_type.WorkoutType_Name
-            for row in rows
-        )

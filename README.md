@@ -27,13 +27,10 @@ Le backend couvre les besoins suivants:
 
 - API REST versionnee sous `/api/v0`
 - Authentification JWT
-- CRUD pour utilisateurs, produits, equipements, workout types, meal logs, workout sessions, biometrics logs
+- CRUD pour utilisateurs, produits, equipements, meal logs, workout sessions, biometrics logs
 - Endpoint analytics personnel
 - Exports CSV admin pour la reutilisation des donnees
 - Suite de tests automatisee
-
-Note metier:
-- Chaque `workout_session` doit desormais referencer un type via `WorkoutType_ID`.
 
 ## Stack technique
 
@@ -61,7 +58,6 @@ MSPR1.EPSI-FastAPI/
 │   │   ├── product.py
 │   │   ├── equipment.py
 │   │   ├── meal_log.py
-│   │   ├── workout_type.py
 │   │   ├── workout_session.py
 │   │   ├── biometrics_log.py
 │   │   ├── analytics.py
@@ -153,34 +149,6 @@ Endpoints disponibles:
 - `GET /api/v0/exports/workout-sessions.csv`
 - `GET /api/v0/exports/biometrics-logs.csv`
 
-Note:
-- `workout-sessions.csv` inclut `WorkoutType_ID` et `WorkoutType_Name`.
-
-## Workout Types
-
-Les types d'entrainement sont geres dans une table dediee (`workout_types`).
-
-Exemples de types:
-
-- squats
-- abdos
-- pumps
-- tractions
-- biking
-- running
-- other
-
-Endpoints disponibles:
-
-- `GET /api/v0/workout-types/`
-- `GET /api/v0/workout-types/{workout_type_id}`
-- `POST /api/v0/workout-types/` (admin)
-- `PUT /api/v0/workout-types/{workout_type_id}` (admin)
-- `DELETE /api/v0/workout-types/{workout_type_id}` (admin)
-
-Important:
-- La creation/mise a jour d'une session (`/workout-sessions`) requiert un `WorkoutType_ID` existant.
-
 Ces routes retournent:
 
 - `Content-Type: text/csv`
@@ -255,6 +223,6 @@ L'API sera disponible sur `http://localhost:8000`.
 
 ## Limites connues et prochaines etapes
 
-- Ajouter de la pagination/filtrage avancee sur certains endpoints (exports volumineux, historiques).
-- Completer la documentation fonctionnelle avec davantage d'exemples de workflows metier.
+- Le schema est actuellement cree au demarrage via SQLAlchemy.
+- Pour une industrialisation complete, ajouter des migrations versionnees (Alembic) et un guide de deploiement infra complet.
 

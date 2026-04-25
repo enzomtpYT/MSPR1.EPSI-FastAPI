@@ -15,7 +15,6 @@ from src.config import settings
 from src.database import Base, get_db
 from src.models.user import User
 from src.models.product import Product
-from src.models.workout_type import WorkoutType
 
 # Use SQLite in-memory database for tests (thread-safe)
 SQLALCHEMY_TEST_DATABASE_URL = "sqlite:///:memory:"
@@ -121,16 +120,6 @@ def test_product(db: Session) -> Product:
     db.commit()
     db.refresh(product)
     return product
-
-
-@pytest.fixture
-def test_workout_type(db: Session) -> WorkoutType:
-    """Create a test workout type."""
-    workout_type = WorkoutType(WorkoutType_Name="running")
-    db.add(workout_type)
-    db.commit()
-    db.refresh(workout_type)
-    return workout_type
 
 
 @pytest.fixture

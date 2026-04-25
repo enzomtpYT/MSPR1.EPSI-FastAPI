@@ -9,7 +9,6 @@ from src.models.biometrics_log import BiometricsLog
 from src.models.meal_log import MealLog
 from src.models.product import Product
 from src.models.user import User
-from src.models.workout_type import WorkoutType
 from src.models.workout_session import WorkoutSession
 
 
@@ -33,11 +32,6 @@ class TestAnalyticsSummary:
         db.commit()
         db.refresh(other_user)
 
-        workout_type = WorkoutType(WorkoutType_Name="cardio")
-        db.add(workout_type)
-        db.commit()
-        db.refresh(workout_type)
-
         p1 = Product(product_name="P1", product_kcal=100.0)
         p2 = Product(product_name="P2", product_kcal=250.0)
         p3 = Product(product_name="P3", product_kcal=500.0)
@@ -56,19 +50,19 @@ class TestAnalyticsSummary:
                     User_ID=test_user.User_ID,
                     Session_Date=date(2026, 3, 10),
                     Session_Duration=30,
-                    WorkoutType_ID=workout_type.WorkoutType_ID,
+                    Session_Type="cardio",
                 ),
                 WorkoutSession(
                     User_ID=test_user.User_ID,
                     Session_Date=date(2026, 3, 11),
                     Session_Duration=60,
-                    WorkoutType_ID=workout_type.WorkoutType_ID,
+                    Session_Type="strength",
                 ),
                 WorkoutSession(
                     User_ID=other_user.User_ID,
                     Session_Date=date(2026, 3, 12),
                     Session_Duration=120,
-                    WorkoutType_ID=workout_type.WorkoutType_ID,
+                    Session_Type="other",
                 ),
                 BiometricsLog(
                     User_ID=test_user.User_ID,

@@ -4,7 +4,6 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 
 from src.database import get_db
-from src.models.workout_type import WorkoutType
 from src.models.workout_session import WorkoutSession
 from src.models.user import User
 from src.schemas import WorkoutSessionCreate, WorkoutSessionRead
@@ -17,10 +16,6 @@ CurrentUser = Annotated[User, Depends(get_current_user)]
 
 @router.post("/", response_model=WorkoutSessionRead, status_code=201)
 def create_session(session: WorkoutSessionCreate, db: DB, current_user: CurrentUser):
-    workout_type = db.query(WorkoutType).filter(WorkoutType.WorkoutType_ID == session.WorkoutType_ID).first()
-    if not workout_type:
-        raise HTTPException(404, "Workout type not found")
-
     db_session = WorkoutSession(
         **session.model_dump(exclude={"User_ID"}),
         User_ID=current_user.User_ID,
@@ -55,11 +50,6 @@ def update_session(session_id: int, payload: WorkoutSessionCreate, db: DB, curre
     ).first()
     if not session:
         raise HTTPException(404, "Workout session not found")
-
-    workout_type = db.query(WorkoutType).filter(WorkoutType.WorkoutType_ID == payload.WorkoutType_ID).first()
-    if not workout_type:
-        raise HTTPException(404, "Workout type not found")
-
     for key, value in payload.model_dump(exclude={"User_ID"}).items():
         setattr(session, key, value)
     session.User_ID = current_user.User_ID

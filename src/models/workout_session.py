@@ -1,5 +1,5 @@
 from datetime import datetime, timezone
-from sqlalchemy import Column, Integer, Date, ForeignKey, DateTime
+from sqlalchemy import Column, Integer, Float, Date, String, ForeignKey, DateTime
 from src.database import Base
 
 
@@ -16,7 +16,7 @@ class WorkoutSession(Base):
     Session_AvgBpm = Column(Integer, nullable=True)
     Session_RestingBpm = Column(Integer, nullable=True)
     Session_Duration = Column(Integer, nullable=True)
-    WorkoutType_ID = Column(Integer, ForeignKey("workout_types.WorkoutType_ID"), nullable=False)
+    Session_Type = Column(String, nullable=True)
     User_Feedback_Score = Column(Integer, nullable=True)
     created_at = Column(DateTime, default=utc_now, nullable=False)
     updated_at = Column(DateTime, default=utc_now, onupdate=utc_now, nullable=False)
