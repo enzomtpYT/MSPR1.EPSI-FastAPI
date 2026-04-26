@@ -20,6 +20,14 @@ class Settings:
 		self.ACCESS_TOKEN_EXPIRE_MINUTES = int(
 			os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES", "30")
 		)
+		self.DEFAULT_ADMIN_EMAIL = os.getenv("DEFAULT_ADMIN_EMAIL", "")
+		self.DEFAULT_ADMIN_PASSWORD = os.getenv("DEFAULT_ADMIN_PASSWORD", "")
+		self.DEFAULT_ADMIN_IS_ADMIN = os.getenv("DEFAULT_ADMIN_IS_ADMIN", "true").lower() in (
+			"1",
+			"true",
+			"yes",
+			"on",
+		)
 
 
 settings = Settings()

@@ -4,6 +4,8 @@ Backend metier FastAPI pour la plateforme HealthAI Coach.
 
 Ce projet expose une API REST securisee (JWT), des routes CRUD metier, un endpoint analytics, et des exports CSV admin pour repondre aux besoins backend MSPR.
 
+Au demarrage, le backend applique les migrations Alembic puis cree un utilisateur admin par defaut si DEFAULT_ADMIN_EMAIL et DEFAULT_ADMIN_PASSWORD sont definis dans l'environnement.
+
 ## Sommaire
 
 - [Objectifs du backend](#objectifs-du-backend)
@@ -94,6 +96,9 @@ DATABASE_URL=postgresql://postgres:postgres@localhost:5432/mspr_db
 SECRET_KEY=your-strong-secret-key
 ALGORITHM=HS256
 ACCESS_TOKEN_EXPIRE_MINUTES=30
+DEFAULT_ADMIN_EMAIL=admin@example.com
+DEFAULT_ADMIN_PASSWORD=adminpassword123
+DEFAULT_ADMIN_IS_ADMIN=true
 ```
 
 Note migration:
