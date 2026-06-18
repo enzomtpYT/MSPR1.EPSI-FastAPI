@@ -176,3 +176,19 @@ class TestGetUserById:
         assert response.status_code == status.HTTP_200_OK
         data = response.json()
         assert data["User_ID"] == test_user.User_ID
+
+
+class TestUserProfilePicture:
+    """Tests for updating user profile picture."""
+
+    def test_update_profile_picture(self, client: TestClient, user_token: str):
+        """Test user can update their profile picture."""
+        headers = {"Authorization": f"Bearer {user_token}"}
+        response = client.put(
+            "/api/v0/users/me/profile_picture",
+            json={"profile_picture_url": "https://example.com/pic.jpg"},
+            headers=headers
+        )
+        assert response.status_code == status.HTTP_200_OK
+        data = response.json()
+        assert data["profile_picture_url"] == "https://example.com/pic.jpg"

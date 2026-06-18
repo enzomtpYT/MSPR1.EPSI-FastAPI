@@ -51,6 +51,7 @@ class UserBase(BaseModel):
     User_Dietary_Preferences: str | None = None
     User_Budget_Level: str | None = None
     User_Injuries: str | None = None
+    profile_picture_url: str | None = None
 
 
 class UserCreate(UserBase):

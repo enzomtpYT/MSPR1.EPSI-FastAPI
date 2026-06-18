@@ -63,7 +63,8 @@ MSPR1.EPSI-FastAPI/
 │   │   ├── workout_session.py
 │   │   ├── biometrics_log.py
 │   │   ├── analytics.py
-│   │   └── exports.py         # Exports CSV admin
+│   │   ├── exports.py         # Exports CSV admin
+│   │   └── posts.py           # Fonctionnalités sociales (Réseau)
 │   └── test/                  # Tests Pytest
 └── docs/
 		├── endpoints.md           # Description fonctionnelle des endpoints
@@ -140,6 +141,23 @@ Flux standard:
 ```text
 Authorization: Bearer <token>
 ```
+
+## Réseau Social
+
+Un mini-réseau social a été intégré pour permettre aux utilisateurs de partager leurs progrès.
+
+Endpoints disponibles :
+
+- **Profil** : 
+  - `PUT /api/v0/users/me/profile_picture` : Mettre à jour l'URL de sa photo de profil.
+- **Posts** : 
+  - `POST /api/v0/posts/` : Créer un post (avec ou sans URL de média).
+  - `GET /api/v0/posts/feed?sort=new|popular` : Récupérer le fil d'actualité.
+- **Interactions** : 
+  - `POST /api/v0/posts/{post_id}/like` : Liker un post.
+  - `DELETE /api/v0/posts/{post_id}/like` : Retirer son like.
+  - `POST /api/v0/posts/{post_id}/comments` : Ajouter un commentaire.
+  - `GET /api/v0/posts/{post_id}/comments` : Lire les commentaires.
 
 ## Exports CSV (compliance MSPR)
 
