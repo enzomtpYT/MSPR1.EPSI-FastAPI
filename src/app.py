@@ -12,7 +12,8 @@ from src.router import (
     workout_session,
     meal_log,
     biometrics_log,
-    etl
+    etl,
+    posts,
 )
 
 app = FastAPI()
@@ -35,6 +36,7 @@ api.include_router(workout_session.router)
 api.include_router(meal_log.router)
 api.include_router(biometrics_log.router)
 api.include_router(etl.router)
+api.include_router(posts.router)
 
 app.include_router(api)
 

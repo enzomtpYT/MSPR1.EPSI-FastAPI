@@ -85,6 +85,23 @@ def get_current_user_profile(current_user: User = Depends(get_current_user)):
     return current_user
 
 
+from pydantic import BaseModel
+class ProfilePictureUpdate(BaseModel):
+    profile_picture_url: str
+
+@router.put("/me/profile_picture", response_model=UserRead)
+def update_profile_picture(
+    payload: ProfilePictureUpdate,
+    db: DB,
+    current_user: User = Depends(get_current_user),
+):
+    """Update user's profile picture URL."""
+    current_user.profile_picture_url = payload.profile_picture_url
+    db.commit()
+    db.refresh(current_user)
+    return current_user
+
+
 @router.get("/{user_id}", response_model=UserRead)
 def get_user(
     user_id: int,

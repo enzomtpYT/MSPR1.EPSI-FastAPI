@@ -33,5 +33,9 @@ class User(Base):
     User_Dietary_Preferences = Column(String, nullable=True)
     User_Budget_Level = Column(String, nullable=True)
     User_Injuries = Column(String, nullable=True)
+    profile_picture_url = Column(String, nullable=True)
 
     equipment = relationship("Equipment", secondary=user_equipment_association, back_populates="users")
+    posts = relationship("Post", back_populates="user", cascade="all, delete-orphan")
+    comments = relationship("Comment", back_populates="user", cascade="all, delete-orphan")
+    likes = relationship("Like", back_populates="user", cascade="all, delete-orphan")

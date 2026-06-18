@@ -155,3 +155,48 @@ class UserAnalyticsSummary(BaseModel):
     avg_workout_duration_minutes: float | None = None
     avg_sleep_hours: float | None = None
     latest_weight: float | None = None
+
+
+# Social Schemas
+class UserBasicInfo(BaseModel):
+    User_ID: int
+    User_mail: str
+    profile_picture_url: str | None = None
+    model_config = ConfigDict(from_attributes=True)
+
+
+class CommentBase(BaseModel):
+    content: str
+
+
+class CommentCreate(CommentBase):
+    pass
+
+
+class CommentResponse(CommentBase):
+    id: int
+    user_id: int
+    post_id: int
+    created_at: datetime
+    user: UserBasicInfo | None = None
+    model_config = ConfigDict(from_attributes=True)
+
+
+class PostBase(BaseModel):
+    content: str | None = None
+    media_type: str = "none"
+    media_urls: list[str] | None = None
+
+
+class PostCreate(PostBase):
+    pass
+
+
+class PostResponse(PostBase):
+    id: int
+    user_id: int
+    created_at: datetime
+    updated_at: datetime
+    likes_count: int = 0
+    user: UserBasicInfo | None = None
+    model_config = ConfigDict(from_attributes=True)
