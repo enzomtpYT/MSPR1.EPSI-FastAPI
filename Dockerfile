@@ -17,6 +17,7 @@ COPY alembic.ini ./
 COPY alembic ./alembic
 COPY src ./src
 
+ENV PYTHONPATH=/app
 ENV PATH="/app/.venv/bin:$PATH"
 
 EXPOSE 8000
