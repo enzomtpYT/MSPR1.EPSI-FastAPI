@@ -27,7 +27,9 @@ def create_session(session: WorkoutSessionCreate, db: DB, current_user: CurrentU
 
 
 @router.get("/", response_model=list[WorkoutSessionRead])
-def get_sessions(db: DB, current_user: CurrentUser, skip: int = 0, limit: int = 100):
+def get_sessions(db: DB, current_user: CurrentUser, skip: int = 0, limit: int = 100000):
+    if current_user.isAdmin:
+        return db.query(WorkoutSession).offset(skip).limit(limit).all()
     return db.query(WorkoutSession).filter(WorkoutSession.User_ID == current_user.User_ID).offset(skip).limit(limit).all()
 
 

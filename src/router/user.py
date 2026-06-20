@@ -67,7 +67,7 @@ def login(credentials: UserLogin, db: DB):
 def get_users(
     db: DB,
     skip: int = 0,
-    limit: int = 100,
+    limit: int = 100000,
     current_user: User = Depends(get_current_user),
 ):
     """Get all users (admin only)."""

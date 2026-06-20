@@ -33,7 +33,7 @@ def create_product(product: ProductCreate, db: DB, current_user: CurrentUser):
 
 
 @router.get("/", response_model=list[ProductRead])
-def get_products(db: DB, current_user: CurrentUser, skip: int = 0, limit: int = 100):
+def get_products(db: DB, current_user: CurrentUser, skip: int = 0, limit: int = 100000):
     # Return all products (shared nutritional database)
     return db.query(Product).offset(skip).limit(limit).all()
 
