@@ -28,6 +28,12 @@ class Settings:
 			"yes",
 			"on",
 		)
+		# CORS Origins
+		raw_origins = os.getenv(
+			"CORS_ORIGINS",
+			"http://localhost:5173,http://127.0.0.1:5173,http://localhost:3000",
+		)
+		self.CORS_ORIGINS = [o.strip() for o in raw_origins.split(",") if o.strip()]
 
 
 settings = Settings()
@@ -37,3 +43,4 @@ DATABASE_URL = settings.DATABASE_URL
 SECRET_KEY = settings.SECRET_KEY
 ALGORITHM = settings.ALGORITHM
 ACCESS_TOKEN_EXPIRE_MINUTES = settings.ACCESS_TOKEN_EXPIRE_MINUTES
+CORS_ORIGINS = settings.CORS_ORIGINS
