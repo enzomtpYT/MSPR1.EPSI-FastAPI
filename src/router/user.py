@@ -60,7 +60,7 @@ def login(credentials: UserLogin, db: DB):
     access_token = create_access_token(
         data={"sub": str(user.User_ID)}, expires_delta=access_token_expires
     )
-    return {"access_token": access_token, "token_type": "bearer"}
+    return {"token": access_token}
 
 
 @router.get("/", response_model=list[UserRead])
