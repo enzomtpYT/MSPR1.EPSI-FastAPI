@@ -8,7 +8,7 @@ from src.models.user import User
 from src.models.post import Post
 from src.models.comment import Comment
 from src.models.like import Like
-from src.schemas import PostResponse, CommentCreate, CommentResponse
+from src.schemas import PostResponse, CommentCreate, CommentResponse, UserBasicInfo
 from src.auth import get_current_user
 
 router = APIRouter(prefix="/posts", tags=["posts"])
@@ -47,12 +47,19 @@ def create_post(
     db.commit()
     db.refresh(new_post)
     
-    setattr(new_post, "likes_count", 0)
-    setattr(new_post, "comments_count", 0)
-    setattr(new_post, "is_liked", False)
-    setattr(new_post, "user", format_author(new_post.user))
-    
-    return new_post
+    return {
+        "id": new_post.id,
+        "user_id": new_post.user_id,
+        "content": new_post.content,
+        "media_type": new_post.media_type,
+        "media_urls": new_post.media_urls,
+        "created_at": new_post.created_at,
+        "updated_at": getattr(new_post, "updated_at", None),
+        "likes_count": 0,
+        "comments_count": 0,
+        "is_liked": False,
+        "user": format_author(new_post.user)
+    }
 
 @router.get("/me", response_model=list[PostResponse])
 def get_my_posts(
@@ -71,6 +78,7 @@ def get_my_posts(
         .all()
     )
 
+    result = []
     for post in posts:
         likes_count = db.query(Like).filter(Like.post_id == post.id).count()
         comments_count = db.query(Comment).filter(Comment.post_id == post.id).count()
@@ -79,12 +87,21 @@ def get_my_posts(
             .filter(Like.post_id == post.id, Like.user_id == current_user.User_ID)
             .first() is not None
         )
-        setattr(post, "likes_count", likes_count)
-        setattr(post, "comments_count", comments_count)
-        setattr(post, "is_liked", is_liked)
-        setattr(post, "user", format_author(post.user))
+        result.append({
+            "id": post.id,
+            "user_id": post.user_id,
+            "content": post.content,
+            "media_type": post.media_type,
+            "media_urls": post.media_urls,
+            "created_at": post.created_at,
+            "updated_at": getattr(post, "updated_at", None),
+            "likes_count": likes_count,
+            "comments_count": comments_count,
+            "is_liked": is_liked,
+            "user": format_author(post.user)
+        })
 
-    return posts
+    return result
 
 @router.delete("/{post_id}", status_code=204)
 def delete_post(
@@ -124,17 +141,27 @@ def get_posts(
         
     posts = query.offset(skip).limit(limit).all()
     
+    result = []
     for post in posts:
         likes_count = db.query(Like).filter(Like.post_id == post.id).count()
         comments_count = db.query(Comment).filter(Comment.post_id == post.id).count()
         is_liked = db.query(Like).filter(Like.post_id == post.id, Like.user_id == current_user.User_ID).first() is not None
         
-        setattr(post, "likes_count", likes_count)
-        setattr(post, "comments_count", comments_count)
-        setattr(post, "is_liked", is_liked)
-        setattr(post, "user", format_author(post.user))
+        result.append({
+            "id": post.id,
+            "user_id": post.user_id,
+            "content": post.content,
+            "media_type": post.media_type,
+            "media_urls": post.media_urls,
+            "created_at": post.created_at,
+            "updated_at": getattr(post, "updated_at", None),
+            "likes_count": likes_count,
+            "comments_count": comments_count,
+            "is_liked": is_liked,
+            "user": format_author(post.user)
+        })
         
-    return posts
+    return result
 
 @router.post("/{post_id}/like", status_code=200)
 def toggle_like_post(
@@ -183,11 +210,17 @@ def add_comment(
     db.commit()
     db.refresh(new_comment)
     
-    setattr(new_comment, "user", format_author(new_comment.user))
     comments_count = db.query(Comment).filter(Comment.post_id == post_id).count()
-    comment_dict = CommentResponse.model_validate(new_comment).model_dump(by_alias=True)
-    comment_dict["commentsCount"] = comments_count
-    return comment_dict
+    return {
+        "id": new_comment.id,
+        "user_id": new_comment.user_id,
+        "post_id": new_comment.post_id,
+        "content": new_comment.content,
+        "created_at": new_comment.created_at,
+        "updated_at": getattr(new_comment, "updated_at", None),
+        "user": format_author(new_comment.user),
+        "commentsCount": comments_count
+    }
 
 @router.get("/{post_id}/comments", response_model=list[CommentResponse])
 def get_comments(
@@ -195,15 +228,80 @@ def get_comments(
     db: DB,
     skip: int = Query(0, ge=0),
     limit: int = Query(20, ge=1, le=100),
+    sort: str = Query("desc", pattern="^(asc|desc)$"),
     current_user: User = Depends(get_current_user),
 ):
-    """Get comments of a post."""
+    """Get comments of a post, ordered by created_at asc or desc."""
     post = db.query(Post).filter(Post.id == post_id).first()
     if not post:
         raise HTTPException(status_code=404, detail="Post not found")
-        
-    comments = db.query(Comment).filter(Comment.post_id == post_id).order_by(desc(Comment.created_at)).offset(skip).limit(limit).all()
+
+    order = Comment.created_at.asc() if sort == "asc" else Comment.created_at.desc()
+    comments = (
+        db.query(Comment)
+        .filter(Comment.post_id == post_id)
+        .order_by(order)
+        .offset(skip)
+        .limit(limit)
+        .all()
+    )
+    result = []
     for comment in comments:
-        setattr(comment, "user", format_author(comment.user))
-        
-    return comments
+        result.append({
+            "id": comment.id,
+            "user_id": comment.user_id,
+            "post_id": comment.post_id,
+            "content": comment.content,
+            "created_at": comment.created_at,
+            "updated_at": getattr(comment, "updated_at", None),
+            "user": format_author(comment.user)
+        })
+
+    return result
+
+
+@router.delete("/{post_id}/comments/{comment_id}", status_code=204)
+def delete_comment(
+    post_id: int,
+    comment_id: int,
+    db: DB,
+    current_user: User = Depends(get_current_user),
+):
+    """Delete a comment (author or admin only)."""
+    comment = (
+        db.query(Comment)
+        .filter(Comment.id == comment_id, Comment.post_id == post_id)
+        .first()
+    )
+    if not comment:
+        raise HTTPException(status_code=404, detail="Comment not found")
+    if comment.user_id != current_user.User_ID and not current_user.isAdmin:
+        raise HTTPException(status_code=403, detail="Not authorized to delete this comment")
+    db.delete(comment)
+    db.commit()
+
+
+@router.get("/{post_id}/likes", response_model=list[UserBasicInfo])
+def get_post_likes(
+    post_id: int,
+    db: DB,
+    current_user: User = Depends(get_current_user),
+):
+    """Return the list of users who liked a post."""
+    post = db.query(Post).filter(Post.id == post_id).first()
+    if not post:
+        raise HTTPException(status_code=404, detail="Post not found")
+
+    likes = db.query(Like).filter(Like.post_id == post_id).all()
+    users = []
+    for like in likes:
+        user = like.user
+        if user:
+            # Build a dict that satisfies UserBasicInfo's validation_alias fields
+            users.append({
+                "User_ID": user.User_ID,
+                "User_DisplayName": user.User_DisplayName,
+                "User_mail": user.User_mail,
+                "profile_picture_url": user.profile_picture_url,
+            })
+    return [UserBasicInfo.model_validate(u) for u in users]

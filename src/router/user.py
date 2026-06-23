@@ -141,8 +141,18 @@ def update_user(
     if not user:
         raise HTTPException(404, "User not found")
     
-    # Hash password if provided
     update_data = payload.model_dump()
+
+    # Validate displayName uniqueness if it's being changed
+    new_display_name = update_data.get("User_DisplayName")
+    if new_display_name and new_display_name != user.User_DisplayName:
+        if db.query(User).filter(User.User_DisplayName == new_display_name).first():
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="This display name is already taken"
+            )
+
+    # Hash password if provided
     if update_data.get("User_password"):
         update_data["User_password"] = hash_password(update_data["User_password"])
     

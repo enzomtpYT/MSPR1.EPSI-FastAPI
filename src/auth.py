@@ -10,7 +10,7 @@ from src.config import settings
 from src.database import get_db
 from src.models.user import User
 
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/v0/users/login")
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/v0/auth/login")
 
 
 def hash_password(password: str) -> str:

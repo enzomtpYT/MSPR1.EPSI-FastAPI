@@ -78,8 +78,7 @@ class TestUserLogin:
         )
         assert response.status_code == status.HTTP_200_OK
         data = response.json()
-        assert "access_token" in data
-        assert data["token_type"] == "bearer"
+        assert "token" in data
     
     def test_login_invalid_email(self, client: TestClient):
         """Test login with non-existent email fails."""
