@@ -20,6 +20,7 @@ class User(Base):
     User_ID = Column(Integer, primary_key=True, index=True)
     User_mail = Column(String, unique=True, index=True)
     User_password = Column(String)
+    User_DisplayName = Column(String, nullable=False, server_default="User")
     isAdmin = Column(Boolean, default=False, nullable=False)
     created_at = Column(DateTime, default=utc_now, nullable=False)
     updated_at = Column(DateTime, default=utc_now, onupdate=utc_now, nullable=False)

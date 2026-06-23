@@ -16,6 +16,7 @@ from src.router import (
     biometrics_log,
     etl,
     posts,
+    auth,
 )
 
 app = FastAPI()
@@ -42,6 +43,7 @@ api.include_router(meal_log.router)
 api.include_router(biometrics_log.router)
 api.include_router(etl.router)
 api.include_router(posts.router)
+api.include_router(auth.router)
 
 app.include_router(api)
 

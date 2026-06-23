@@ -5,12 +5,21 @@ from pydantic import BaseModel, ConfigDict
 
 # Authentication Schemas
 class Token(BaseModel):
-    access_token: str
-    token_type: str
+    token: str
 
 
 class TokenData(BaseModel):
     user_id: int | None = None
+
+
+class UserRegister(BaseModel):
+    displayName: str
+    email: str
+    password: str
+
+class AuthLogin(BaseModel):
+    email: str
+    password: str
 
 
 # Schéma de réponse json pour les requetes
@@ -159,34 +168,38 @@ class UserAnalyticsSummary(BaseModel):
 
 
 # Social Schemas
+from pydantic import Field
+
 class UserBasicInfo(BaseModel):
     User_ID: int
-    User_mail: str
-    profile_picture_url: str | None = None
-    model_config = ConfigDict(from_attributes=True)
+    displayName: str = Field(validation_alias="User_DisplayName")
+    email: str = Field(validation_alias="User_mail")
+    avatar: str | None = Field(default=None, validation_alias="profile_picture_url")
+    model_config = ConfigDict(from_attributes=True, populate_by_name=True)
 
 
 class CommentBase(BaseModel):
-    content: str
+    text: str
 
 
 class CommentCreate(CommentBase):
     pass
 
 
-class CommentResponse(CommentBase):
+class CommentResponse(BaseModel):
     id: int
     user_id: int
     post_id: int
     created_at: datetime
-    user: UserBasicInfo | None = None
-    model_config = ConfigDict(from_attributes=True)
+    text: str = Field(validation_alias="content")
+    author: UserBasicInfo | None = Field(default=None, validation_alias="user")
+    model_config = ConfigDict(from_attributes=True, populate_by_name=True)
 
 
 class PostBase(BaseModel):
-    content: str | None = None
-    media_type: str = "none"
-    media_urls: list[str] | None = None
+    text: str | None = Field(default=None, validation_alias="content")
+    mediaType: str = Field(default="none", validation_alias="media_type")
+    media: list[str] | None = Field(default=None, validation_alias="media_urls")
 
 
 class PostCreate(PostBase):
@@ -198,6 +211,8 @@ class PostResponse(PostBase):
     user_id: int
     created_at: datetime
     updated_at: datetime
-    likes_count: int = 0
-    user: UserBasicInfo | None = None
-    model_config = ConfigDict(from_attributes=True)
+    likesCount: int = Field(default=0, validation_alias="likes_count")
+    commentsCount: int = Field(default=0, validation_alias="comments_count")
+    isLiked: bool = Field(default=False, validation_alias="is_liked")
+    author: UserBasicInfo | None = Field(default=None, validation_alias="user")
+    model_config = ConfigDict(from_attributes=True, populate_by_name=True)
