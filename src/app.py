@@ -1,4 +1,6 @@
+import os
 from fastapi import APIRouter, FastAPI
+from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
 from prometheus_fastapi_instrumentator import Instrumentator
 
@@ -22,6 +24,10 @@ from src.router import (
 app = FastAPI()
 
 Instrumentator().instrument(app).expose(app)
+
+if not os.path.exists("static"):
+    os.makedirs("static")
+app.mount("/static", StaticFiles(directory="static"), name="static")
 
 app.add_middleware(
     CORSMiddleware,

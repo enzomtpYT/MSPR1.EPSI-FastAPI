@@ -16,6 +16,7 @@ class TestUserCreate:
             "/api/v0/users/",
             json={
                 "User_mail": "newuser@example.com",
+                "User_DisplayName": "New User",
                 "User_password": "securepassword123",
                 "User_age": 25,
                 "User_weight": 70.0,
@@ -36,6 +37,7 @@ class TestUserCreate:
             "/api/v0/users/",
             json={
                 "User_mail": test_user.User_mail,
+                "User_DisplayName": "Duplicate User",
                 "User_password": "differentpassword123",
                 "User_age": 30,
             },

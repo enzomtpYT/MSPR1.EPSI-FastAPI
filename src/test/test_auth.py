@@ -85,6 +85,26 @@ def test_auth_login_fail(client: TestClient):
     assert response.status_code == 401
 
 def test_auth_logout(client: TestClient):
-    response = client.post("/api/v0/auth/logout")
+    client.post(
+        "/api/v0/auth/register",
+        json={
+            "displayName": "LogoutUser",
+            "email": "logoutuser@example.com",
+            "password": "password123"
+        }
+    )
+    login_response = client.post(
+        "/api/v0/auth/login",
+        data={
+            "username": "logoutuser@example.com",
+            "password": "password123"
+        }
+    )
+    token = login_response.json()["token"]
+    
+    response = client.post(
+        "/api/v0/auth/logout",
+        headers={"Authorization": f"Bearer {token}"}
+    )
     assert response.status_code == 200
-    assert response.json()["message"] == "Successfully logged out"
+    assert response.json()["detail"] == "Successfully logged out"

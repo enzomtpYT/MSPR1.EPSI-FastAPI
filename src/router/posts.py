@@ -1,3 +1,7 @@
+import os
+import uuid
+import shutil
+from pathlib import Path
 from typing import Annotated, Optional
 from fastapi import APIRouter, Depends, HTTPException, status, Query, Form, UploadFile, File
 from sqlalchemy.orm import Session
@@ -35,7 +39,19 @@ def create_post(
     """Create a new post."""
     media_urls = []
     if media:
-        media_urls = [file.filename for file in media if file and file.filename]
+        upload_dir = Path("static/uploads/posts")
+        upload_dir.mkdir(parents=True, exist_ok=True)
+
+        for file in media:
+            if file and file.filename:
+                ext = os.path.splitext(file.filename)[1]
+                unique_filename = f"{uuid.uuid4()}{ext}"
+                file_path = upload_dir / unique_filename
+                
+                with open(file_path, "wb") as buffer:
+                    shutil.copyfileobj(file.file, buffer)
+                
+                media_urls.append(f"/static/uploads/posts/{unique_filename}")
 
     new_post = Post(
         user_id=current_user.User_ID,

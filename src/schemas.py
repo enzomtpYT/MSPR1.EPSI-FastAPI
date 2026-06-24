@@ -50,6 +50,7 @@ class ProductRead(ProductBase):
 
 class UserBase(BaseModel):
     User_mail: str
+    User_DisplayName: str
     User_Subscription: str | None = None
     User_age: int | None = None
     User_weight: float | None = None
