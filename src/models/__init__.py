@@ -7,3 +7,4 @@ from .biometrics_log import BiometricsLog
 from .post import Post, MediaType
 from .comment import Comment
 from .like import Like
+from .token_blacklist import BlacklistedToken

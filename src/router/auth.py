@@ -7,8 +7,9 @@ from sqlalchemy.orm import Session
 
 from src.database import get_db
 from src.models.user import User
+from src.models.token_blacklist import BlacklistedToken
 from src.schemas import Token, UserRegister
-from src.auth import hash_password, verify_password, create_access_token
+from src.auth import hash_password, verify_password, create_access_token, oauth2_scheme
 from src.config import settings
 
 router = APIRouter(prefix="/auth", tags=["auth"])
@@ -68,3 +69,23 @@ def login(
         expires_delta=timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
     )
     return {"token": access_token}
+
+
+@router.post("/logout", status_code=status.HTTP_200_OK)
+def logout(
+    token: Annotated[str, Depends(oauth2_scheme)],
+    db: DB,
+):
+    """Logout by blacklisting the current token."""
+    blacklisted = db.query(BlacklistedToken).filter(BlacklistedToken.token == token).first()
+    if blacklisted:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Token already blacklisted"
+        )
+        
+    db_token = BlacklistedToken(token=token)
+    db.add(db_token)
+    db.commit()
+    
+    return {"detail": "Successfully logged out"}
