@@ -152,10 +152,12 @@ def update_user(
                 detail="This display name is already taken"
             )
 
-    # Hash password if provided
+    # Hash password if provided, otherwise remove it so the existing hash is preserved
     if update_data.get("User_password"):
         update_data["User_password"] = hash_password(update_data["User_password"])
-    
+    else:
+        update_data.pop("User_password", None)
+
     for key, value in update_data.items():
         setattr(user, key, value)
     
