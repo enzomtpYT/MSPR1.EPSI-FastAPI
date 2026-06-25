@@ -141,7 +141,7 @@ def update_user(
     if not user:
         raise HTTPException(404, "User not found")
     
-    update_data = payload.model_dump()
+    update_data = payload.model_dump(exclude_unset=True)
 
     # Validate displayName uniqueness if it's being changed
     new_display_name = update_data.get("User_DisplayName")
@@ -160,7 +160,7 @@ def update_user(
 
     for key, value in update_data.items():
         setattr(user, key, value)
-    
+
     db.commit()
     db.refresh(user)
     return user
