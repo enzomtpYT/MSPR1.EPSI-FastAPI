@@ -1,6 +1,7 @@
 from datetime import datetime, timezone
 from sqlalchemy import Column, Integer, String, Float, Table, ForeignKey, DateTime, Boolean
 from sqlalchemy.orm import relationship
+from sqlalchemy.ext.hybrid import hybrid_property
 from src.database import Base
 
 
@@ -34,7 +35,18 @@ class User(Base):
     User_Dietary_Preferences = Column(String, nullable=True)
     User_Budget_Level = Column(String, nullable=True)
     User_Injuries = Column(String, nullable=True)
-    profile_picture_url = Column(String, nullable=True)
+    _profile_picture_url = Column("profile_picture_url", String, nullable=True)
+
+    @hybrid_property
+    def profile_picture_url(self) -> str:
+        if self._profile_picture_url:
+            return self._profile_picture_url
+        name = (self.User_DisplayName or "User").replace(" ", "+")
+        return f"https://ui-avatars.com/api/?name={name}&background=random"
+
+    @profile_picture_url.setter
+    def profile_picture_url(self, value: str | None) -> None:
+        self._profile_picture_url = value
 
     equipment = relationship("Equipment", secondary=user_equipment_association, back_populates="users")
     posts = relationship("Post", back_populates="user", cascade="all, delete-orphan")
