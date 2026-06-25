@@ -6,7 +6,7 @@ from sqlalchemy.orm import Session
 
 from src.database import get_db
 from src.models.user import User
-from src.schemas import UserCreate, UserRead, UserLogin, Token
+from src.schemas import UserCreate, UserUpdate, UserRead, UserLogin, Token
 from src.auth import hash_password, verify_password, create_access_token, get_current_user
 from src.config import settings
 
@@ -125,7 +125,7 @@ def get_user(
 @router.put("/{user_id}", response_model=UserRead)
 def update_user(
     user_id: int,
-    payload: UserCreate,
+    payload: UserUpdate,
     db: DB,
     current_user: User = Depends(get_current_user),
 ):

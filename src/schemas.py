@@ -69,6 +69,11 @@ class UserCreate(UserBase):
     isAdmin: bool = False
 
 
+class UserUpdate(UserBase):
+    User_password: str | None = None
+    isAdmin: bool = False
+
+
 class UserLogin(BaseModel):
     User_mail: str
     User_password: str
